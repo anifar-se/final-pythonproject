@@ -1,0 +1,69 @@
+# Import required libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset (Replace with actual file source or URL)
+try:
+    df = pd.read_csv("covid_global_data.csv")
+    print(" Dataset successfully loaded!")
+except FileNotFoundError:
+    print(" Error: Dataset file not found. Please check the file path.")
+    exit()
+except Exception as e:
+    print(f" An error occurred: {e}")
+    exit()
+
+# Display first few rows
+print("\nFirst 5 rows of the dataset:")
+print(df.head())
+
+# Check dataset structure and missing values
+print("\n Dataset info:")
+print(df.info())
+print("\nMissing values count:")
+print(df.isnull().sum())
+
+# Clean missing values if any
+df.fillna(df.mean(), inplace=True)
+
+# Basic Data Analysis
+print("\nStatistical Summary:")
+print(df.describe())
+
+# Grouping data by country
+print("\nAverage daily cases per country:")
+print(df.groupby("country")["daily_cases"].mean())
+
+# Data Visualization
+plt.figure(figsize=(14, 7))
+
+# 1️⃣ Line Chart: COVID-19 cases trend over time
+plt.subplot(2, 2, 1)
+df.groupby("date")["daily_cases"].sum().plot(marker='o')
+plt.title("COVID-19 Cases Over Time")
+plt.xlabel("Date")
+plt.ylabel("Total Daily Cases")
+
+# 2️⃣ Bar Chart: Total cases by country
+plt.subplot(2, 2, 2)
+df.groupby("country")["total_cases"].max().sort_values().plot(kind="barh", color="skyblue")
+plt.title("Total COVID-19 Cases by Country")
+plt.xlabel("Total Cases")
+plt.ylabel("Country")
+
+# 3️⃣ Histogram: Distribution of daily cases
+plt.subplot(2, 2, 3)
+sns.histplot(df["daily_cases"], bins=30, kde=True, color="red")
+plt.title("Daily Cases Distribution")
+
+# 4️⃣ Scatter Plot: COVID-19 Cases vs. Deaths
+plt.subplot(2, 2, 4)
+sns.scatterplot(x=df["daily_cases"], y=df["daily_deaths"], hue=df["continent"])
+plt.title("COVID-19 Cases vs. Deaths")
+plt.xlabel("Daily Cases")
+plt.ylabel("Daily Deaths")
+
+# Show the plots
+plt.tight_layout()
+plt.show()
